@@ -1,4 +1,4 @@
-function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr_R, pr_C, noise_a, noise_v, nsamp, ntrial)
+function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr_R, pr_C, noise_a, noise_v, nsamp, ntrials)
 % run task_2 model, not made to run with small RAM
 % returns matrix w/ probability of answering R=1
 %   resp size = (n: stim locations, w: experimental W's seperated for analysis)
@@ -12,10 +12,10 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     
     % generate W vec for inference
     W = ones(k,2^k);
-    for w = 1:2^k
-        c = dec2bin(k,w-1);
+    for j = 1:2^k
+        c = dec2bin(j-1,k);
         for i=1:k
-            W(i,w) = W(i,w) * sign(str2num(c(i))-0.5);
+            W(i,j) = W(i,j) * sign(str2num(c(i))-0.5);
         end
     end
     
@@ -30,10 +30,10 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     X = repmat(stim,1,1,1,ntrials); % size=(k,n,w,ntrials)
     
     % add noise
-    X_t =    stim(:,:,w) + randn(k,n,w,ntrials)*noise_a;
-    X_n = -1*stim(:,:,w) + randn(k,n,w,ntrials)*noise_a;
-    X_R =    abs(stim(:,:,w))*cond + randn(k,n,w,ntrials)*noise_v;
-    X_L = -1*abs(stim(:,:,w))*cond + randn(k,n,w,ntrials)*noise_v;
+    X_t =    X + randn(k,n,w,ntrials)*noise_a;
+    X_n = -1*X + randn(k,n,w,ntrials)*noise_a;
+    X_R =    abs(X)*cond + randn(k,n,w,ntrials)*noise_v;
+    X_L = -1*abs(X)*cond + randn(k,n,w,ntrials)*noise_v;
     
     % compute closed-form variables
     a_tn = sig_n/(sig_t + sig_n);
@@ -52,11 +52,12 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     X_sRL = X_RL*a_sRL;
     sig_sRL = sig_RL * a_sRL;
     
-    p_R0 = zeros(size(W,1),n,w,ntrials);
-    p_R1 = zeros(size(W,1),n,w,ntrials);
+    % choice vars
+    l_R0 = zeros(size(W,2),n,w,ntrials);
+    l_R1 = zeros(size(W,2),n,w,ntrials);
     
     % marginalize over W
-    for i = 1:size(W,1)
+    for i = 1:size(W,2)
         Wi = repmat(W(:,i),1,n,w,ntrials);
         
         % Wi dependant variables
@@ -82,22 +83,62 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
         tC =  log(normcdf(zero, -Wi.*X_tnRL, sqrt(sig_tnRL)))...
               + lognormpdf(X_stn, Wi.*X_sRL, sqrt(sig_stn + sig_sRL))...
               + Z + log(pr_C) - log(gam + gamn);
-                
+        
+        % size = (size(W,2),n,w,ntrials,2)
         tmp(:,:,:,:,1)=tnC;
         tmp(:,:,:,:,2)=tC;
         
+        % 
         if R(i) % W -> R deterministic
-            p_R1(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2);
+            l_R1(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2);
         else
-            p_R0(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2^k-2);
+            l_R0(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2^k-2);
         end
         
     end % end marginalize over W
     
     % get rid of unfilled rows
-    p_R0 = p_R0(~all(p_R0==0,1));
-    p_R1 = p_R1(~all(p_R1==0,1));
+    % note: p_RX size = (size(W,1),n,w,ntrials)
+    l_R0 = l_R0(2:end-1,:,:,:);
+    l_R1 = l_R1([1,end],:,:,:);
     
+    % combine w prior (1,n,w,ntrials)
+    p_R0 = logsumexp(l_R0,1) + log(1-pr_R);
+    p_R1 = logsumexp(l_R1,1) + log(pr_R);
     
+    % calculate denomenator
+    tmp = zeros(2,n,w,ntrials);
+    tmp(1,:,:,:,:) = p_R1;
+    tmp(2,:,:,:,:) = p_R0;
+    
+    den = logsumexp(tmp,1);
+    
+    % choice variable
+    p_R = exp(p_R1 - den);
+    
+    % sample and return
+    p_Rs = sampling(p_R, nsamp);
+    
+    resp = mean(squeeze(p_Rs),3);
 
+end
+
+function [resp] = sampling(inp, nsamp)
+        
+    if any(isnan(inp),'all') || any(isinf(inp),'all')
+        ["num error:", inp]
+    end
+    
+    inp(isnan(inp)) = .5;
+    
+    % nsamples < Inf
+    if nsamp~=Inf
+        resp = binocdf(floor(nsamp/2), nsamp, inp, 'upper')...
+        + .5*binopdf(nsamp/2, nsamp, inp);
+    end
+
+    % nsamples = Inf
+    if nsamp==Inf
+        resp = (inp > 0.5) + 0.5*(inp == 0.5);
+    end
 end
