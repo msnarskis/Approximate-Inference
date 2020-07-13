@@ -24,7 +24,7 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     
     % init vars
     resp = zeros(n,size(stim,3));
-    zero = zeros(k,n);
+    zero = zeros(k,n,w,ntrials);
     
     % repeat for trials
     X = repmat(stim,1,1,1,ntrials); % size=(k,n,w,ntrials)
@@ -52,10 +52,10 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     X_sRL = X_RL*a_sRL;
     sig_sRL = sig_RL * a_sRL;
     
-    p_R0 = zeros(size(W,1),k,n,w,ntrials);
-    p_R1 = zeros(size(W,1),k,n,w,ntrials);
+    p_R0 = zeros(size(W,1),n,w,ntrials);
+    p_R1 = zeros(size(W,1),n,w,ntrials);
     
-    % marginalize over Ws
+    % marginalize over W
     for i = 1:size(W,1)
         Wi = repmat(W(:,i),1,n,w,ntrials);
         
@@ -87,13 +87,16 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
         tmp(:,:,:,:,2)=tC;
         
         if R(i) % W -> R deterministic
-            p_R1(i,:,:,:,:) = sum(logsumexp(tmp,5),1)-log(2);
+            p_R1(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2);
         else
-            p_R0(i,:,:,:,:) = sum(logsumexp(tmp,5),1)-log(2^k-2);
+            p_R0(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2^k-2);
         end
         
-    end
+    end % end marginalize over W
     
+    % get rid of unfilled rows
+    p_R0 = p_R0(~all(p_R0==0,1));
+    p_R1 = p_R1(~all(p_R1==0,1));
     
     
 
