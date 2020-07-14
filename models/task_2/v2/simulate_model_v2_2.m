@@ -2,8 +2,8 @@
 
 % stimulus parameters
 eps_range = [0, 30];
-k = 2;
-n = 4;
+k = 3;
+n = 20;
 
 % model parameters
 sig_t = 10; % (std dev)
@@ -13,14 +13,14 @@ sig_sa = 100;
 sig_sv = 100;
 
 pr_R = 0.5;
-pr_C = 0.5;
+pr_C = 1;
 
-nsamp = 1; % trials per W vector
-ntrials = 1;
+nsamp = 100; % trials per W vector
+ntrials = 3000;
 
 % noisy stimulus generation
-noise_a = 0;
-noise_v = 0;
+noise_a = sig_t;
+noise_v = sig_v;
 
 %% Generate Stimulus
 % for R = 0
@@ -53,80 +53,7 @@ match = model_v2_2(stim, 1, sig_t^2, sig_n^2, sig_v^2, sig_sa^2, sig_sv^2,...
 
 match_corr = abs(corr - match);
 
-%% Model Analyses
+%% Model Plotting
+plot_debug_corr(eps, match_corr, center_corr,...
+    sprintf('M(r) v C(b): k=%d, p(C)=%.1f nsamp=%d', k, pr_C, nsamp));
 
-% match per W
-figure;
-hold on;
-
-title("Match R=1");
-xlabel("stimulus location (eps)");
-ylabel("prob R=1");
-ylim([0 1]);
-w=size(W,1);
-for i = 2:(w-1)
-    plot(eps, match_corr(:,i), 'LineWidth', 4);
-end
-
-for i = [1,w]
-    plot(eps, match_corr(:,i), '--', 'LineWidth', 4);
-end
-
-
-% center per W
-figure;
-hold on;
-
-title("Center R=1");
-xlabel("stimulus location (eps)");
-ylabel("prob R=1");
-ylim([0 1]);
-
-for i = 2:(w-1)
-    plot(eps, center_corr(:,i), 'LineWidth', 4);
-end
-
-for i = [1,w]
-    plot(eps, center_corr(:,i), '--', 'LineWidth', 4);
-end
-
-%% 2D of above
-% figure
-% hold on
-%
-% title("Match")
-% imagesc(eps, w_amp, match');
-% xlabel("eps")
-% ylabel("W")
-% colorbar;
-%
-% figure
-% hold on
-%
-% title("Center")
-% imagesc(eps, w_amp, center');
-% xlabel("eps")
-% ylabel("W")
-% colorbar;
-
-%% Match vs Center
-figure
-hold on
-
-title("Center (b) v Matched (r)");
-xlabel("stimulus location (eps)");
-ylabel("prob correct");
-ylim([0 1]);
-
-% for i = 1:w-2
-%     plot(eps, match(:,i), 'r', 'LineWidth', 2);
-%     plot(eps, center(:,i), 'b', 'LineWidth', 2);
-% end
-%
-% for i = w-1:w
-%     plot(eps, match(:,i), 'r--', 'LineWidth', 2);
-%     plot(eps, center(:,i), 'b--', 'LineWidth', 2);
-% end
-
-plot(eps, mean(match_corr, 2), 'r', 'LineWidth', 4);
-plot(eps, mean(center_corr, 2), 'b', 'LineWidth', 4);
