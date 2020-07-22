@@ -88,7 +88,7 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
         tmp(:,:,:,:,1)=tnC;
         tmp(:,:,:,:,2)=tC;
         
-        % 
+        % product across frames
         if R(i) % W -> R deterministic
             l_R1(i,:,:,:) = sum(logsumexp(tmp,5),1)-log(2);
         else
@@ -119,7 +119,7 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     % sample and return
     p_Rs = sampling(p_R, nsamp);
     
-    resp = mean(squeeze(p_Rs),3);
+    resp = squeeze(mean(p_Rs,4));
 
 end
 

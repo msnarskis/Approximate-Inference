@@ -2,8 +2,8 @@
 
 % stimulus parameters
 eps_range = [0, 30];
+n = 10;
 k = 3;
-n = 20;
 
 % model parameters
 sig_t = 10; % (std dev)
@@ -13,10 +13,10 @@ sig_sa = 100;
 sig_sv = 100;
 
 pr_R = 0.5;
-pr_C = 1;
+pr_C = 0.5;
 
-nsamp = 100; % trials per W vector
-ntrials = 3000;
+nsamp = Inf; % trials per W vector
+ntrials = 100;
 
 % noisy stimulus generation
 noise_a = sig_t;
@@ -33,10 +33,10 @@ for w = 1:2^k
 end
 
 % correct answer
-corr = repmat([0;ones(2^k-2,1);0],1,n)';
+corr = repmat([ones(2^k-2,1);0;0],1,n)';
 
 % stimulus var
-stim = generate_stimulus_v2(eps_range, n, k, W);
+[stim, W] = generate_stim_v2_2(eps_range, n, k);
 eps = linspace(eps_range(1), eps_range(2), n);
 
 %% Run Model
