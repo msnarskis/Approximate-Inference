@@ -2,7 +2,7 @@
 
 % stimulus parameters
 eps_range = [0, 30];
-n = 10;
+n = 20;
 k = 3;
 
 % model parameters
@@ -13,10 +13,10 @@ sig_sa = 100;
 sig_sv = 100;
 
 pr_R = 0.5;
-pr_C = 0.5;
+pr_C = 1;
 
 nsamp = Inf; % trials per W vector
-ntrials = 100;
+ntrials = 4000;
 
 % noisy stimulus generation
 noise_a = sig_t;

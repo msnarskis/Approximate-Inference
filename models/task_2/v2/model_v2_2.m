@@ -126,7 +126,7 @@ end
 function [resp] = sampling(inp, nsamp)
         
     if any(isnan(inp),'all') || any(isinf(inp),'all')
-        ["num error:", inp]
+        ["num error:", sum(isnan(inp),'all')]
     end
     
     inp(isnan(inp)) = .5;
