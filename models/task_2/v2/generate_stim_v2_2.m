@@ -1,5 +1,5 @@
 %generate_stimulus_v2([0, 5], 10, 3, [1 1 1; 1 -1 1; -1 -1 1; -1 -1 -1])
-function [stim, W] = generate_stimulus_v2_2(eps_range, n, k)
+function [stim, W] = generate_stim_v2_2(eps_range, n, k)
     % Generates (not noisy) Stimulus (e_t) for 
     % all values of W over n locations
     % size(stim) = (k: frames, n: location, W: corresponding order)
@@ -15,6 +15,9 @@ function [stim, W] = generate_stimulus_v2_2(eps_range, n, k)
     
     [~, i] = sort(abs(sum(W,2)));
     W = W(i,:);
+    
+    % TEST
+    W = [ones(1,k); -1*ones(1,k)];
     
     
     loc = linspace(eps_range(1), eps_range(2), n); % abs val of locations
