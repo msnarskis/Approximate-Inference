@@ -66,8 +66,8 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
         sig_tnRL = sig_stn * a_tnRL;
                 
         % normalizing stuff
-        gamn = (1-pr_C)*0.25;
-        gam = (pr_C)*normpdf(0,0,sqrt(sig_sa + sig_sv))*0.5;
+        % gamn = (1-pr_C)*0.25;
+        % gam = (pr_C)*normpdf(0,0,sqrt(sig_stn + sig_sRL))*0.5;
         
         Z =   lognormpdf(X_tn, zero, sqrt(sig_tn + sig_sa))...
             + lognormpdf(X_RL, zero, sqrt(sig_RL + sig_sv))...
@@ -77,12 +77,12 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
         % no combine term
         tnC = log(normcdf(zero, -Wi.*X_stn, sqrt(sig_stn)))...
               + log(normcdf(zero, -X_sRL, sqrt(sig_sRL)))...
-              + Z + log(1-pr_C) - log(gam + gamn);
+              + Z + log(1-pr_C);% - log(gam + gamn);
                 
         % combine term
         tC =  log(normcdf(zero, -Wi.*X_tnRL, sqrt(sig_tnRL)))...
               + lognormpdf(X_stn, Wi.*X_sRL, sqrt(sig_stn + sig_sRL))...
-              + Z + log(pr_C) - log(gam + gamn);
+              + Z + log(pr_C);% - log(gam + gamn);
         
         % size = (size(W,2),n,w,ntrials,2)
         tmp(:,:,:,:,1)=tnC;

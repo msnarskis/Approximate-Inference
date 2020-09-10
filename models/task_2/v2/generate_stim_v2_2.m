@@ -14,11 +14,7 @@ function [stim, W] = generate_stim_v2_2(eps_range, n, k)
     end
     
     [~, i] = sort(abs(sum(W,2)));
-    W = W(i,:);
-    
-    % TEST
-    W = [ones(1,k); -1*ones(1,k)];
-    
+    W = W(i,:);    
     
     loc = linspace(eps_range(1), eps_range(2), n); % abs val of locations
     loc_k = repmat(loc, k, 1); % repeated
