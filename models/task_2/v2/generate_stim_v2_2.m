@@ -1,5 +1,5 @@
 %generate_stimulus_v2([0, 5], 10, 3, [1 1 1; 1 -1 1; -1 -1 1; -1 -1 -1])
-function [stim, W] = generate_stim_v2_2(eps_range, n, k)
+function [stim, W, corr] = generate_stim_v2_2(eps_range, n, k)
     % Generates (not noisy) Stimulus (e_t) for 
     % all values of W over n locations
     % size(stim) = (k: frames, n: location, W: corresponding order)
@@ -27,4 +27,6 @@ function [stim, W] = generate_stim_v2_2(eps_range, n, k)
         end
     end
     
+    corr = repmat([ones(2^k-2,1);0;0],1,n)';
+ 
 end

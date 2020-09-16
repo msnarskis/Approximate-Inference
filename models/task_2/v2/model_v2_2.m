@@ -120,7 +120,6 @@ function [resp] = model_v2_2(stim, cond, sig_t, sig_n, sig_v, sig_sa, sig_sv, pr
     p_Rs = sampling(p_R, nsamp);
     
     resp = squeeze(mean(p_Rs,4));
-
 end
 
 function [resp] = sampling(inp, nsamp)
