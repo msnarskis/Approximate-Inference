@@ -1,12 +1,12 @@
-function [f1] = plot_debug_corr(eps, match, center, varargin)
-    
+function [f1] = plot_debug_corr(stim, resp, varargin)
+
     main_title = "Matched (r) v Center (b)";
     
     if ~isempty(varargin)
         main_title = varargin{1};
     end
     
-    W = size(match,2);
+    W = size(resp.match,2);
 
     f1 = figure;
     
@@ -19,11 +19,11 @@ function [f1] = plot_debug_corr(eps, match, center, varargin)
     ylabel("Prob answer correctly");
     ylim([0 1]);
     
-    match_full = mean([ mean(match(:,W-1:W),2), mean(match(:,1:W-2),2) ],2);
-    center_full = mean([ mean(center(:,W-1:W),2), mean(center(:,1:W-2),2) ],2);
+    match_full = mean([ mean(resp.match_corr(:,W-1:W),2), mean(resp.match_corr(:,1:W-2),2) ],2);
+    center_full = mean([ mean(resp.center_corr(:,W-1:W),2), mean(resp.center_corr(:,1:W-2),2) ],2);
     
-    plot(eps, mean(match_full, 2), 'r', 'LineWidth', 4);
-    plot(eps, mean(center_full, 2), 'b', 'LineWidth', 4);
+    plot(stim.eps, mean(match_full, 2), 'r', 'LineWidth', 4);
+    plot(stim.eps, mean(center_full, 2), 'b', 'LineWidth', 4);
     
     legend("matched","center", 'Location','best');
     
@@ -38,11 +38,11 @@ function [f1] = plot_debug_corr(eps, match, center, varargin)
     ylim([0 1]);
     
     for i = 1:(W-2)
-        plot(eps,match(:,i), 'LineWidth',4);
+        plot(stim.eps,resp.match_corr(:,i), 'LineWidth',4);
     end
 
     for i = [W-1,W]
-        plot(eps,match(:,i), '--', 'LineWidth',4);
+        plot(stim.eps,resp.match_corr(:,i), '--', 'LineWidth',4);
     end
     
     % look at individual Ws for Center condition
@@ -55,11 +55,11 @@ function [f1] = plot_debug_corr(eps, match, center, varargin)
     ylim([0 1]);
     
     for i = 1:(W-2)
-        plot(eps,center(:,i), 'LineWidth',4);
+        plot(stim.eps,resp.center_corr(:,i), 'LineWidth',4);
     end
 
     for i = [W-1,W]
-        plot(eps,center(:,i), '--', 'LineWidth',4);
+        plot(stim.eps,resp.center_corr(:,i), '--', 'LineWidth',4);
     end
 
 end

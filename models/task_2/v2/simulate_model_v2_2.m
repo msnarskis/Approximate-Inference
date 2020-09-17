@@ -2,62 +2,53 @@
 clc, clear all;
 
 % stimulus and plot selection
-gen_stim = @(eps_range, n, k) generate_stim_v2_2(eps_range, n, k);
-% gen_stim = @(eps_range, n, k) gen_stim_test_bias(k);
+% gen_stim = @(stim) generate_stim_v2_2(stim);
+gen_stim = @(stim) gen_stim_test_bias(stim);
 
-plot_me = @(eps, match_corr, center_corr, k, pr_C, nsamp, W) ...
-    plot_debug_corr(eps, match_corr, center_corr, ...
-    sprintf('M(r) v C(b): k=%d, p(C)=%.1f nsamp=%d', k, pr_C, nsamp));
-% plot_me = @(eps, match_corr, center_corr, k, pr_C, nsamp, W) ...
-%     plot_test_bias(match_corr, center_corr, W);
+% plot_me = @(stim,resp,par) ...
+%     plot_debug_corr(stim,resp, ...
+%     sprintf('M(r) v C(b): k=%d, p(C)=%.1f nsamp=%d', stim.k, par.pr_C, par.nsamp));
+plot_me = @(stim,resp,par) ...
+    plot_test_bias(stim,resp);
 
 % stimulus parameters
-eps_range = [0, 30];
-n = 20;
-k = 3;
+stim.eps_range = [0, 10];
+stim.n = 20;
+stim.k = 3;
 
 % model parameters
-sig_t = 10; % (std dev)
-sig_n = 10;
-sig_v = 1;
-sig_sa = 100;
-sig_sv = 100;
+par.var_t = 10; % (std dev)
+par.var_n = 10;
+par.var_v = 1;
+par.var_sa = 100;
+par.var_sv = 100;
 
-pr_R = 0.5;
-pr_C = 0.5;
+par.pr_R = 0.5;
+par.pr_C = 0.5;
 
-nsamp = 1; % trials per W vector
-ntrials = 2000;
+par.nsamp = 1; % trials per W vector
+par.ntrials = 100;
 
-% noisy stimulus generation
-noise_a = sqrt(sig_t);
-noise_v = sqrt(sig_v);
+par.noisy_in = 0;
 
 
 %% Generate Stimulus
 
-% stimulus var
-[stim, W, corr] = gen_stim(eps_range, n, k);
-eps = linspace(eps_range(1), eps_range(2), n);
-
-stim = stim;
-
+stim = gen_stim(stim);
 
 %% Run Model
 
 % returns resp: (n: locations, w: size(W))
 
-center = model_v2_2(stim, 0, sig_t^2, sig_n^2, sig_v^2, sig_sa^2, sig_sv^2,...
-    pr_R, pr_C, noise_a, noise_v, nsamp, ntrials);
+resp.center = model_v2_2(stim, par, 0);
 
-match = model_v2_2(stim, 1, sig_t^2, sig_n^2, sig_v^2, sig_sa^2, sig_sv^2,...
-    pr_R, pr_C, noise_a, noise_v, nsamp, ntrials);
+resp.match = model_v2_2(stim, par, 1);
 
-match_corr = abs(corr - match);
-center_corr = abs(corr - center);
+resp.match_corr = abs(stim.corr - resp.match);
+resp.center_corr = abs(stim.corr - resp.center);
 
 
 %% Model Plotting
 
-plot_me(eps, match_corr, center_corr, k, pr_C, nsamp, W);
+plot_me(stim, resp, par);
 

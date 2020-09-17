@@ -1,10 +1,11 @@
-function [] = plot_test_bias(match, center, W)
+function [] = plot_test_bias(stim,resp,varargin)
     
     title = "Testing Bias";
     
     figure;
     hold on
-    bar(1:size(W,3), match);
-    bar(1:size(W,3), center);
+    bar([resp.match,resp.center]);
+    
+    legend('match','center');
     
 end
