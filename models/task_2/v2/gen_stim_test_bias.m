@@ -16,6 +16,6 @@ function [stim] = gen_stim_test_bias(stim)
     
     stim.eps = [-1,1];
     stim.W = W;
-    stim.in = W;
+    stim.in = zeros(size(W));
     stim.corr = [ones(2^stim.k-2,1);0;0];
 end
