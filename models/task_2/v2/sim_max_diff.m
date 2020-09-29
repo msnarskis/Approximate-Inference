@@ -85,19 +85,19 @@ end
 
 subplot(2,2,1);
 xlim(stim.eps_range);
-title(sprintf("Psychometric: Match"));
+title(sprintf("Psychometric: Match -- nsamp:%d",par.nsamp));
 xlabel("stim: dist from center");ylabel("P(correct)");
 legend(lbl1,stim.kslab,'Location','best');
 
 subplot(2,2,3);
 xlim(stim.eps_range);
-title(sprintf("Psychometric: Center"));
+title(sprintf("Psychometric: Center -- nsamp:%d",par.nsamp));
 xlabel("stim: dist from center");ylabel("P(correct)");
 legend(lbl2,stim.kslab,'Location','best');
 
 subplot(2,2,[2 4]);
 xlim(stim.eps_range);
-title(sprintf("Difference in curves (M-C)"));
+title(sprintf("Difference in curves (M-C) -- nsamp:%d",par.nsamp));
 xlabel("stim: dist from center");ylabel("\Delta P(correct)");
 legend(lbl3,stim.kslab,'Location','best');
 
@@ -109,8 +109,8 @@ set(gcf,'Position',[100 100 1600 1000]);
 for i=1:s
     f = figure;
     clim = [0 1];
-    xlims = [0.5, size(diff,2)+0.5];
-    ylims = [0.5, size(diff,1)+0.5];
+    xlims = [0.5, size(resps(i).match_corr,2)+0.5];
+    ylims = [0.5, size(resps(i).match_corr,1)+0.5];
     
     % match condition
     ax1 = subplot(2,2,1);
@@ -119,7 +119,7 @@ for i=1:s
     imagesc(resps(i).match_corr, clim);
     ylabel("stimulus location");xlabel("stimulus class");
     xlim(xlims);ylim(ylims);xticks([]);
-    title(sprintf("Flattened psychometric curves: Match; k=%d", stim.ks(i)));
+    title(sprintf("Flattened psychometric curves: Match; k=%d, nsamp=%d",stim.ks(i),par.nsamp));
     c = colorbar; ylabel(c, "P(correct)");
     
     % center condition
@@ -129,7 +129,7 @@ for i=1:s
     imagesc(resps(i).center_corr, clim);
     ylabel("stimulus location");xlabel("stimulus class");
     xlim(xlims);ylim(ylims);xticks([]);
-    title(sprintf("Flattened psychometric curves: Center; k=%d", stim.ks(i)));
+    title(sprintf("Flattened psychometric curves: Center; k=%d, nsamp=%d",stim.ks(i),par.nsamp));
     c = colorbar; ylabel(c, "P(correct)");
         
     % difference between conds
@@ -139,7 +139,7 @@ for i=1:s
     imagesc(resps(i).diff_corr);
     ylabel("stimulus location");xlabel("stimulus class");
     xlim(xlims);ylim(ylims);xticks([]);
-    title(sprintf("Difference btw Match - Center; k=%d", stim.ks(i)));
+    title(sprintf("Difference btw Match - Center; k=%d, nsamp=%d",stim.ks(i),par.nsamp));
     c = colorbar; ylabel(c, "\Delta P(correct)");
     
     set(gcf,'Position',[100 100 1600 1000]);
@@ -162,13 +162,13 @@ p1 = plot(stim.ks,diff_mean, 'LineWidth', 4);
 p2 = plot(stim.ks,diff_part, 'LineWidth', 4);
 
 legend([p1, p2], {'Average', 'By Stimulus Class'}, 'Location', 'northwest');
-title("Maximum Diff in P(Correct) by k");
+title(sprintf("Maximum Diff in P(Correct) by k, nsamp=%d",par.nsamp));
 ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
 %% Save
 file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-nsamp:%d.mat", par.nsamp));
-save(file,'resps','par','stim');
+%save(file,'resps','par','stim');
 
 
 
