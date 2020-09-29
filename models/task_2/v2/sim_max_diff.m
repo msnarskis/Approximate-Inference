@@ -7,6 +7,8 @@ stim.n = 30;
 stim.ks = [2,3,5,7];
 stim.kslab = {'k=2','k=3','k=5','k=7'};
 
+s = size(stim.ks,2);
+
 % model parameters
 par.var_t = 10; % (std dev)
 par.var_n = 10;
@@ -42,7 +44,7 @@ for k=stim.ks
     resps = [resps; resp];
 end
 
-%% test plot
+%% plot psychometric curves and diff between match, center
 figure
 hold on
 
@@ -52,7 +54,6 @@ lbl2 = [];
 lbl3 = [];
 
 % loop over k's
-s = size(stim.ks,2);
 for i=1:s
     % match
     resps(i).match_corr_r1 = mean(resps(i).match_corr(:,end-1:end), 2);
@@ -60,8 +61,8 @@ for i=1:s
     resps(i).match_corr_mean = mean([resps(i).match_corr_r1, resps(i).match_corr_r0],2);
     
     subplot(2,2,1);hold on;
-    plot(stim.eps, resps(i).match_corr, '--', 'Color',[i/s, 0, 1-(i/s)], 'LineWidth', 1);
-    lbl1 = [lbl1 plot(stim.eps, resps(i).match_corr_mean, 'Color',[i/s, 0, 1-(i/s)], 'LineWidth', 4)];
+    plot(stim.eps, resps(i).match_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl1 = [lbl1 plot(stim.eps, resps(i).match_corr_mean, 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 5)];
 
     % center
     resps(i).center_corr_r1 = mean(resps(i).center_corr(:,end-1:end), 2);
@@ -69,16 +70,16 @@ for i=1:s
     resps(i).center_corr_mean = mean([resps(i).center_corr_r1, resps(i).center_corr_r0],2);
     
     subplot(2,2,3);hold on;
-    plot(stim.eps, resps(i).center_corr, '--', 'Color',[i/s, 0.7, 1-(i/s)], 'LineWidth', 1);
-    lbl2 = [lbl2 plot(stim.eps, resps(i).center_corr_mean, 'Color',[i/s,0.7, 1-(i/s)], 'LineWidth', 4)];
+    plot(stim.eps, resps(i).center_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl2 = [lbl2 plot(stim.eps, resps(i).center_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
     
     % difference    
     resps(i).diff_corr = resps(i).match_corr-resps(i).center_corr;
     resps(i).diff_corr_mean = resps(i).match_corr_mean - resps(i).center_corr_mean;
     
     subplot(2,2,[2 4]);hold on;
-    plot(stim.eps, resps(i).diff_corr, '--', 'Color',[i/s, 0.35, 1-(i/s)], 'LineWidth', 1);
-    lbl3 = [lbl3 plot(stim.eps, resps(i).diff_corr_mean, 'Color',[i/s,0.35, 1-(i/s)], 'LineWidth', 4)];
+    plot(stim.eps, resps(i).diff_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl3 = [lbl3 plot(stim.eps, resps(i).diff_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
 end
 
 
@@ -100,36 +101,74 @@ title(sprintf("Difference in curves (M-C)"));
 xlabel("stim: dist from center");ylabel("\Delta P(correct)");
 legend(lbl3,stim.kslab,'Location','best');
 
+set(gcf,'Position',[100 100 1600 1000]);
 
-%% max diff
+
+%% plot flattened curves max diff
 
 for i=1:s
-    diff = resps(i).match_corr-resps(i).center_corr;
-    diff_mean = resps(i).match_corr_mean - resps(i).center_corr_mean;
-    
     f = figure;
     clim = [0 1];
+    xlims = [0.5, size(diff,2)+0.5];
+    ylims = [0.5, size(diff,1)+0.5];
     
-    ax1 = subplot(1,2,1);
+    % match condition
+    ax1 = subplot(2,2,1);
     hold on
-    
-    title("match");
     
     imagesc(resps(i).match_corr, clim);
-    ylabel("P(correct)");
-    xlabel("W stimuli");
+    ylabel("stimulus location");xlabel("stimulus class");
+    xlim(xlims);ylim(ylims);xticks([]);
+    title(sprintf("Flattened psychometric curves: Match; k=%d", stim.ks(i)));
+    c = colorbar; ylabel(c, "P(correct)");
     
-    ax2 = subplot(1,2,2);
+    % center condition
+    ax2 = subplot(2,2,3);
+    hold on
+
+    imagesc(resps(i).center_corr, clim);
+    ylabel("stimulus location");xlabel("stimulus class");
+    xlim(xlims);ylim(ylims);xticks([]);
+    title(sprintf("Flattened psychometric curves: Center; k=%d", stim.ks(i)));
+    c = colorbar; ylabel(c, "P(correct)");
+        
+    % difference between conds
+    ax3 = subplot(2,2,[2,4]);
     hold on
     
-    imagesc(resps(i).center_corr, clim);
-    ylabel("P(correct)")
-    xlabel("W stimuli")
-    colorbar;
+    imagesc(resps(i).diff_corr);
+    ylabel("stimulus location");xlabel("stimulus class");
+    xlim(xlims);ylim(ylims);xticks([]);
+    title(sprintf("Difference btw Match - Center; k=%d", stim.ks(i)));
+    c = colorbar; ylabel(c, "\Delta P(correct)");
+    
+    set(gcf,'Position',[100 100 1600 1000]);
 end
 
+%% Diff scaling by k
 
+diff_mean = zeros(1,s);
+diff_part = nan(1,s);
 
+for i=1:s
+    diff_mean(i) = max(resps(i).diff_corr_mean);
+    diff_part(i) = max(max(resps(i).diff_corr));
+end
+
+figure;
+hold on
+
+p1 = plot(stim.ks,diff_mean, 'LineWidth', 4);
+p2 = plot(stim.ks,diff_part, 'LineWidth', 4);
+
+legend([p1, p2], {'Average', 'By Stimulus Class'}, 'Location', 'northwest');
+title("Maximum Diff in P(Correct) by k");
+ylabel("Max \Delta P(correct)");xlabel("k");
+xticks(stim.ks)
+
+%% Save
+file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-nsamp:%d.mat", par.nsamp));
+save(file,'resps','par','stim');
 
 
 
