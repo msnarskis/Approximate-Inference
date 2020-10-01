@@ -19,7 +19,7 @@ par.var_sv = 100;
 par.pr_R = 0.5;
 par.pr_C = 0.5;
 
-par.nsamp = 1; % trials per W vector
+par.nsamp = 100; % trials per W vector
 par.ntrials = 100;
 
 par.noisy_in = 0;
@@ -109,16 +109,16 @@ set(gcf,'Position',[100 100 1600 1000]);
 for i=1:s
     f = figure;
     clim = [0 1];
-    xlims = [0.5, size(resps(i).match_corr,2)+0.5];
-    ylims = [0.5, size(resps(i).match_corr,1)+0.5];
+    xlims = [0.5, size(resps(i).match_corr,1)+0.5];
+    ylims = [0.5, size(resps(i).match_corr,2)+0.5];
     
     % match condition
     ax1 = subplot(2,2,1);
     hold on
     
-    imagesc(resps(i).match_corr, clim);
-    ylabel("stimulus location");xlabel("stimulus class");
-    xlim(xlims);ylim(ylims);xticks([]);
+    imagesc(resps(i).match_corr', clim);
+    xlabel("stimulus location");ylabel("stimulus class");
+    xlim(xlims);ylim(ylims);yticks([]);
     title(sprintf("Flattened psychometric curves: Match; k=%d, nsamp=%d",stim.ks(i),par.nsamp));
     c = colorbar; ylabel(c, "P(correct)");
     
@@ -126,19 +126,19 @@ for i=1:s
     ax2 = subplot(2,2,3);
     hold on
 
-    imagesc(resps(i).center_corr, clim);
-    ylabel("stimulus location");xlabel("stimulus class");
-    xlim(xlims);ylim(ylims);xticks([]);
+    imagesc(resps(i).center_corr', clim);
+    xlabel("stimulus location");ylabel("stimulus class");
+    xlim(xlims);ylim(ylims);yticks([]);
     title(sprintf("Flattened psychometric curves: Center; k=%d, nsamp=%d",stim.ks(i),par.nsamp));
     c = colorbar; ylabel(c, "P(correct)");
         
-    % difference between conds
+    % difference between condsd
     ax3 = subplot(2,2,[2,4]);
     hold on
     
-    imagesc(resps(i).diff_corr);
-    ylabel("stimulus location");xlabel("stimulus class");
-    xlim(xlims);ylim(ylims);xticks([]);
+    imagesc(resps(i).diff_corr');
+    xlabel("stimulus location");ylabel("stimulus class");
+    xlim(xlims);ylim(ylims);yticks([]);
     title(sprintf("Difference btw Match - Center; k=%d, nsamp=%d",stim.ks(i),par.nsamp));
     c = colorbar; ylabel(c, "\Delta P(correct)");
     
