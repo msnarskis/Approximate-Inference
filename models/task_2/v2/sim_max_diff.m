@@ -1,5 +1,5 @@
 %% Simulating for max_diff between conditions
-clc, clear all;
+clc; clear all;
 
 % stimulus parameters
 stim.eps_range = [0, 8];
@@ -20,16 +20,21 @@ par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = 100; % trials per W vector
-par.ntrials = 100;
+par.ntrials = 1000;
 
-par.noisy_in = 0;
+par.noisy_in = 1;
 
 %% Simulate
 model = Model_Task_2(par);
 
 resps = [];
 
+time = [];
+
 for k=stim.ks
+    sprintf("k=%d",k) % for keeping track during run
+    sTime = cputime;
+    
     stim.k = k;
     resp.k = k;
     
@@ -42,6 +47,8 @@ for k=stim.ks
     resp.match_corr  = abs(stim.corr - resp.match);
     
     resps = [resps; resp];
+    
+    time = [time, (cputime - sTime)]
 end
 
 %% plot psychometric curves and diff between match, center
@@ -167,8 +174,9 @@ ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
 %% Save
-file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-nsamp:%d.mat", par.nsamp));
-%save(file,'resps','par','stim');
+file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-t:%d-k:%d-nsamp:%d.mat", par.ntrials, stim.ks(end), par.nsamp));
+save(file,'resps','par','stim');
+
 
 
 
