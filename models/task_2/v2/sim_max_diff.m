@@ -16,10 +16,10 @@ par.var_v = 1;
 par.var_sa = 100;
 par.var_sv = 100;
 
-par.pr_R = 0.5;
+par.pr_R = 0.9;
 par.pr_C = 0.5;
 
-par.nsamp = 100; % trials per W vector
+par.nsamp = Inf; % trials per W vector
 par.ntrials = 1000;
 
 par.noisy_in = 1;
@@ -174,7 +174,7 @@ ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
 %% Save
-file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-t:%d-k:%d-nsamp:%d.mat", par.ntrials, stim.ks(end), par.nsamp));
+file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-t:%d-k:%d-nsamp:%d-pR%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_R));
 save(file,'resps','par','stim');
 
 
