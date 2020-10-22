@@ -16,39 +16,52 @@ par.var_v = 1;
 par.var_sa = 100;
 par.var_sv = 100;
 
-par.pr_R = 0.9;
+par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = Inf; % trials per W vector
-par.ntrials = 1000;
+par.ntrials = 5000;
 
 par.noisy_in = 1;
 
-%% Simulate
-model = Model_Task_2(par);
+%% Simulate and Analysis
 
-resps = [];
+resps = []; % for storing results
 
-time = [];
+time = []; % comp time
 
 for k=stim.ks
-    sprintf("k=%d",k) % for keeping track during run
+    sprintf("k=%d",k) % UX GUI
     sTime = cputime;
     
     stim.k = k;
     resp.k = k;
     
-    stim = generate_stim_v2_2(stim);
+    stim = gen_stim_by_class(stim);
     
-    resp.center = model.simulate(stim,0);
-    resp.match  = model.simulate(stim,1);
+    resp.center = model_v2_2(stim,par,0);
+    resp.match  = model_v2_2(stim,par,1);
     
+    time = [time, (cputime - sTime)] % sim done timestamp
+    
+    % correct
     resp.center_corr = abs(stim.corr - resp.center);
     resp.match_corr  = abs(stim.corr - resp.match);
     
-    resps = [resps; resp];
+    % by R and mean
+    resp.match_corr_r1 = resp.match_corr(:,1);
+    resp.match_corr_r0 = mean(resp.match_corr(:,2:end), 2);
+    resp.match_corr_mean = mean([resp.match_corr_r1, resp.match_corr_r0],2);
     
-    time = [time, (cputime - sTime)]
+    resp.center_corr_r1 = resp.center_corr(:,1);
+    resp.center_corr_r0 = mean(resp.center_corr(:,2:end), 2);
+    resp.center_corr_mean = mean([resp.center_corr_r1, resp.center_corr_r0],2);
+    
+    % diff by k
+    resp.diff_corr = resp.match_corr-resp.center_corr;
+    resp.diff_corr_mean = resp.match_corr_mean - resp.center_corr_mean;
+    
+    resps = [resps; resp];
 end
 
 %% plot psychometric curves and diff between match, center
@@ -63,27 +76,16 @@ lbl3 = [];
 % loop over k's
 for i=1:s
     % match
-    resps(i).match_corr_r1 = mean(resps(i).match_corr(:,end-1:end), 2);
-    resps(i).match_corr_r0 = mean(resps(i).match_corr(:,1:end-2), 2);
-    resps(i).match_corr_mean = mean([resps(i).match_corr_r1, resps(i).match_corr_r0],2);
-    
     subplot(2,2,1);hold on;
     plot(stim.eps, resps(i).match_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
     lbl1 = [lbl1 plot(stim.eps, resps(i).match_corr_mean, 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 5)];
 
-    % center
-    resps(i).center_corr_r1 = mean(resps(i).center_corr(:,end-1:end), 2);
-    resps(i).center_corr_r0 = mean(resps(i).center_corr(:,1:end-2), 2);
-    resps(i).center_corr_mean = mean([resps(i).center_corr_r1, resps(i).center_corr_r0],2);
-    
+    % center   
     subplot(2,2,3);hold on;
     plot(stim.eps, resps(i).center_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
     lbl2 = [lbl2 plot(stim.eps, resps(i).center_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
     
     % difference    
-    resps(i).diff_corr = resps(i).match_corr-resps(i).center_corr;
-    resps(i).diff_corr_mean = resps(i).match_corr_mean - resps(i).center_corr_mean;
-    
     subplot(2,2,[2 4]);hold on;
     plot(stim.eps, resps(i).diff_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
     lbl3 = [lbl3 plot(stim.eps, resps(i).diff_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
@@ -174,10 +176,25 @@ ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
 %% Save
-file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff-t:%d-k:%d-nsamp:%d-pR%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_R));
-save(file,'resps','par','stim');
+ file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pR%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_R));
+ save(file,'resps','par','stim');
 
+%% Aux Functions
 
+% takes a properly weighted average of stim classes
+% for full experiment
+function [exp] = class_collapse(resp,k)
+    % init
+    exp = zeros(size(resp,1),1);
+    
+    % loop over stim classes
+    for i=ceil(k/2)
+        exp = exp + resp(:,i)*nchoosek(k,i-1);
+    end
+    
+    % norm
+    exp = exp/2^k;
+end
 
 
 

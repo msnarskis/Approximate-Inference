@@ -3,8 +3,8 @@ clc, clear all;
 
 % stimulus parameters
 stim.eps_range = [0, 10];
-stim.n = 20;
-stim.k = 7;
+stim.n = 6;
+stim.k = 3;
 
 % model parameters
 par.var_t = 10; % (std dev)
@@ -23,7 +23,7 @@ par.noisy_in = 0;
 
 
 % stimulus and plot selection
-gen_stim = @(stim) generate_stim_v2_2(stim);
+gen_stim = @(stim) gen_stim_by_class(stim);
 % gen_stim = @(stim) gen_stim_test_bias(stim);
 
 plot_me = @(stim,resp,par) ...
@@ -39,24 +39,24 @@ stim = gen_stim(stim);
 
 
 %% Test Class
-model_v2 = Model_Task_2(par);
-
-resp.center = model_v2.simulate(stim,0);
-resp.match  = model_v2.simulate(stim,1);
-resp.match_corr = abs(stim.corr - resp.match);
-resp.center_corr = abs(stim.corr - resp.center);
+% model_v2 = Model_Task_2(par);
+% 
+% resp.center = model_v2.simulate(stim,0);
+% resp.match  = model_v2.simulate(stim,1);
+% resp.match_corr = abs(stim.corr - resp.match);
+% resp.center_corr = abs(stim.corr - resp.center);
 
 %% Run Model
 
 % returns resp: (n: locations, w: size(W))
-% 
-% resp.center = model_v2_2(stim, par, 0);
-% 
-% resp.match = model_v2_2(stim, par, 1);
-% 
-% resp.match_corr = abs(stim.corr - resp.match);
-% resp.center_corr = abs(stim.corr - resp.center);
-% 
+
+resp.center = model_v2_2(stim, par, 0);
+
+resp.match = model_v2_2(stim, par, 1);
+
+resp.match_corr = abs(stim.corr - resp.match);
+resp.center_corr = abs(stim.corr - resp.center);
+
 
 %% Model Plotting
 
