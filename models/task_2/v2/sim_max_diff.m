@@ -3,7 +3,7 @@ clc; clear all;
 
 % stimulus parameters
 stim.eps_range = [0, 8];
-stim.n = 30;
+stim.n = 50;
 stim.ks = [2,3,5,7];
 stim.kslab = {'k=2','k=3','k=5','k=7'};
 
@@ -20,7 +20,7 @@ par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = Inf; % trials per W vector
-par.ntrials = 5000;
+par.ntrials = 50000;
 
 par.noisy_in = 1;
 
@@ -176,8 +176,9 @@ ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
 %% Save
- file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pR%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_R));
- save(file,'resps','par','stim');
+ 
+file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
+save(file,'resps','par','stim');
 
 %% Aux Functions
 
