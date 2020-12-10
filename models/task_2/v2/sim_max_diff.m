@@ -175,6 +175,69 @@ title(sprintf("Maximum Diff in P(Correct) by k, nsamp=%d",par.nsamp));
 ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
+%% PLot more
+
+load('/home/msnarskis/Documents/Research/approximate_inference/models/task_2/v2/sims/sim_max_diff_class-t:50000-k:7-nsamp:Inf-pR0.5.mat');
+resps1=resps;
+par1 = par;
+stim1 = stim;
+
+load('/home/msnarskis/Documents/Research/approximate_inference/models/task_2/v2/sims/sim_max_diff_class-t:50000-k:7-nsamp:1-pR0.5.mat');
+respsInf = resps;
+parInf = par;
+stimInf = stim;
+
+for i=1:s
+    lbl1 = [];
+    lbl2 = [];
+    lbl3 = [];
+    lbl4 = [];
+    figure;
+    % match & center 1 samp
+    subplot(2,2,1);hold on;
+    plot(stim1.eps, resps1(i).match_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl1 = [lbl1 plot(stim1.eps, resps1(i).match_corr_mean, 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 5)...
+        plot(stim1.eps, resps1(i).center_corr_mean, 'Color',[i/s, 1-(i/s), 0.7,], 'LineWidth', 5)];
+    
+    xlim(stim1.eps_range);
+    title(sprintf("Psychometric: k=%d nsamp:%d",stim1.ks(s),par1.nsamp));
+    xlabel("stim: dist from center");ylabel("P(correct)");
+    legend(lbl1,stim1.kslab,'Location','best');
+    
+    % match & center Inf samp
+    subplot(2,2,2);hold on;
+    plot(stimInf.eps, respsInf(i).match_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl2 = [lbl2 plot(stimInf.eps, respsInf(i).match_corr_mean, 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 5)...
+        plot(stimInf.eps, respsInf(i).center_corr_mean, 'Color',[i/s, 1-(i/s), 0.7], 'LineWidth', 5)];
+    
+    xlim(stimInf.eps_range);
+    title(sprintf("Psychometric: k=%d nsamp:%d",stimInf.ks(s),parInf.nsamp));
+    xlabel("stim: dist from center");ylabel("P(correct)");
+    legend(lbl2,stimInf.kslab,'Location','best');
+    
+    % difference 1 samp
+    subplot(2,2,3);hold on;
+    plot(stim1.eps, resps1(i).diff_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl3 = [lbl3 plot(stim1.eps, resps1(i).diff_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
+
+    xlim(stim1.eps_range);
+    title(sprintf("Difference in curves (M-C) -- k=%d nsamp:%d",stim1.ks(s), par1.nsamp));
+    xlabel("stim: dist from center");ylabel("\Delta P(correct)");
+    legend(lbl3,stim1.kslab,'Location','best');
+    
+    % difference Inf samp
+    subplot(2,2,4);hold on;
+    plot(stimInf.eps, respsInf(i).diff_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl4 = [lbl4 plot(stimInf.eps, resps(i).diff_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
+
+    xlim(stimInf.eps_range);
+    title(sprintf("Difference in curves (M-C) -- k=%d nsamp:%d",stimInf.ks(s), parInf.nsamp));
+    xlabel("stim: dist from center");ylabel("\Delta P(correct)");
+    legend(lbl4,stimInf.kslab,'Location','best');
+    
+    set(gcf,'Position',[100 100 1600 1000]);
+end
+
 %% Save
  
 file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));

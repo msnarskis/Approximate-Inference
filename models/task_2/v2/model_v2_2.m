@@ -8,6 +8,9 @@ function [resp] = model_v2_2(stim,par,cond)
 % stim, cond, var_t, var_n, var_v, var_sa, var_sv, pr_R, pr_C, ...
 % noise_a, noise_v, nsamp, ntrials
 
+    % timing (slowpoke code)
+    time.start = cpuTime;
+
     % local parameter values (for speed maybe?)
     var_t = par.var_t; % (std dev)
     var_n = par.var_n;
@@ -27,6 +30,9 @@ function [resp] = model_v2_2(stim,par,cond)
     k = size(stim.in,1); % num frames
     n = size(stim.in,2); % num locations
     w = size(stim.in,3); % num stim classes
+    
+    % time -- init params
+    time.initpar = cputime - time.start;
     
     % generate W arrays (for marginalizing)
     W = ones(k,2^k);
