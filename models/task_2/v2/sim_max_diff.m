@@ -2,12 +2,14 @@
 clc; clear all;
 
 % stimulus parameters
-stim.eps_range = [0, 8];
+stim.eps_range = [0, 12];
 stim.n = 50;
 stim.ks = [2,3,5,7];
 stim.kslab = {'k=2','k=3','k=5','k=7'};
 
 s = size(stim.ks,2);
+
+equiprob = 1; % 1:equiprobable P(W|R), otw OG
 
 % model parameters
 par.var_t = 10; % (std dev)
@@ -20,7 +22,7 @@ par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = Inf; % trials per W vector
-par.ntrials = 50000;
+par.ntrials = 5000;
 
 par.noisy_in = 1;
 
@@ -34,14 +36,23 @@ for k=stim.ks
     sprintf("k=%d",k) % UX GUI
     sTime = cputime;
     
+    if equiprob
+        par.pr_R = 2/2^k;
+    end
+    
     stim.k = k;
     resp.k = k;
     
     stim = gen_stim_by_class(stim);
     
-    resp.center = model_v2_2(stim,par,0);
-    resp.match  = model_v2_2(stim,par,1);
-    
+    if equiprob
+        resp.center = model_v2_2w(stim,par,0);
+        resp.match  = model_v2_2w(stim,par,1);
+    else
+        resp.center = model_v2_2(stim,par,0);
+        resp.match  = model_v2_2(stim,par,1);
+    end
+
     time = [time, (cputime - sTime)] % sim done timestamp
     
     % correct
@@ -51,11 +62,17 @@ for k=stim.ks
     % by R and mean
     resp.match_corr_r1 = resp.match_corr(:,1);
     resp.match_corr_r0 = mean(resp.match_corr(:,2:end), 2);
-    resp.match_corr_mean = mean([resp.match_corr_r1, resp.match_corr_r0],2);
     
     resp.center_corr_r1 = resp.center_corr(:,1);
     resp.center_corr_r0 = mean(resp.center_corr(:,2:end), 2);
-    resp.center_corr_mean = mean([resp.center_corr_r1, resp.center_corr_r0],2);
+    
+    if equiprob
+        resp.match_corr_mean = mean(resp.match_corr,2);
+        resp.center_corr_mean = mean(resp.center_corr,2);
+    else
+        resp.match_corr_mean = mean([resp.match_corr_r1, resp.match_corr_r0],2);
+        resp.center_corr_mean = mean([resp.center_corr_r1, resp.center_corr_r0],2);
+    end
     
     % diff by k
     resp.diff_corr = resp.match_corr-resp.center_corr;
@@ -176,7 +193,7 @@ ylabel("Max \Delta P(correct)");xlabel("k");
 xticks(stim.ks)
 
 %% PLot more
-
+if 0
 load('/home/msnarskis/Documents/Research/approximate_inference/models/task_2/v2/sims/sim_max_diff_class-t:50000-k:7-nsamp:Inf-pR0.5.mat');
 resps1=resps;
 par1 = par;
@@ -237,27 +254,35 @@ for i=1:s
     
     set(gcf,'Position',[100 100 1600 1000]);
 end
-
+end
 %% Save
- 
-file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
-save(file,'resps','par','stim');
+
+if equiprob
+    file = strcat(pwd, sprintf("/models/task_2/v2/sims/simW_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
+else
+    file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
+end
+%save(file,'resps','par','stim');
 
 %% Aux Functions
 
 % takes a properly weighted average of stim classes
 % for full experiment
-function [exp] = class_collapse(resp,k)
-    % init
-    exp = zeros(size(resp,1),1);
-    
-    % loop over stim classes
-    for i=ceil(k/2)
-        exp = exp + resp(:,i)*nchoosek(k,i-1);
+function [exp] = class_collapse(resp,k,w)
+    if w
+        % init
+        exp = zeros(size(resp,1),1);
+
+        % loop over stim classes
+        for i=ceil(k/2)
+            exp = exp + resp(:,i)*nchoosek(k,i-1);
+        end
+
+        % norm
+        exp = exp/2^k;
+    else
+        exp = mean(resp,2);
     end
-    
-    % norm
-    exp = exp/2^k;
 end
 
 
