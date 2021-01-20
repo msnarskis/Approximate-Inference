@@ -3,7 +3,7 @@ clc; clear all;
 
 % stimulus parameters
 stim.eps_range = [0, 12];
-stim.n = 50;
+stim.n = 25;
 stim.ks = [2,3,5,7];
 stim.kslab = {'k=2','k=3','k=5','k=7'};
 
@@ -21,8 +21,8 @@ par.var_sv = 100;
 par.pr_R = 0.5;
 par.pr_C = 0.5;
 
-par.nsamp = Inf; % trials per W vector
-par.ntrials = 5000;
+par.nsamp = 1; % trials per W vector
+par.ntrials = 1000;
 
 par.noisy_in = 1;
 

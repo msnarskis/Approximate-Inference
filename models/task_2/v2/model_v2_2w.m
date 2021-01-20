@@ -159,6 +159,7 @@ function [resp] = sampling(inp, nsamp, eqp, k)
 
     if eqp
         mid = 2/2^k;
+        % if k==2; mid = 0.4999; end
     end
 
     if any(isnan(inp),'all') || any(isinf(inp),'all')
@@ -169,7 +170,7 @@ function [resp] = sampling(inp, nsamp, eqp, k)
     
     % nsamples < Inf
     if nsamp~=Inf
-        resp = binocdf(round(nsamp*mid), nsamp, inp, 'upper')...
+        resp = binocdf(floor(nsamp*mid), nsamp, inp, 'upper')...
         + mid*binopdf(nsamp*mid, nsamp, inp);
     end
 
