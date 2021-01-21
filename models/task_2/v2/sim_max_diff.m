@@ -22,7 +22,7 @@ par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = 1; % trials per W vector
-par.ntrials = 5000;
+par.ntrials = 50000;
 
 par.noisy_in = 1;
 
@@ -272,7 +272,7 @@ if equiprob
 else
     file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
 end
-%save(file,'resps','par','stim');
+save(file,'resps','par','stim');
 
 %% Aux Functions
 
