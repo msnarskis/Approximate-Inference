@@ -158,7 +158,7 @@ function [resp] = sampling(inp, nsamp, eqp, k)
     mid = 0.5;
 
     if eqp
-        mid = 2/2^k;
+        mid = 0.5;%2/2^k;
         % if k==2; mid = 0.4999; end
     end
 
@@ -176,6 +176,6 @@ function [resp] = sampling(inp, nsamp, eqp, k)
 
     % nsamples = Inf
     if nsamp==Inf
-        resp = (inp > 0.5) + 0.5*(inp == 0.5);
+        resp = (inp > mid) + mid*(inp == mid);
     end
 end
