@@ -10,7 +10,7 @@ function [resp] = model_v3(stim,par,cond)
 % noise_a, noise_v, nsamp, ntrials
 
     % timing (slowpoke code)
-    time.start = cpuTime;
+    time.start = cputime;
 
     % local parameter values (for speed maybe?)
     var_t = par.var_t; % (std dev)
@@ -134,8 +134,8 @@ function [resp] = model_v3(stim,par,cond)
     
     % get rid of unfilled rows
     % note: p_RX size = (size(W,1),n,w,ntrials)
-    l_R0 = l_R0(2:end-1,:,:,:);
-    l_R1 = l_R1([1,end],:,:,:);
+    l_R0 = l_R0(R==0,:,:,:);
+    l_R1 = l_R1(R==1,:,:,:);
     
     % combine w/prior on R (1,n,w,ntrials)
     p_R0 = logsumexp(l_R0,1) + log(1-pr_R);
