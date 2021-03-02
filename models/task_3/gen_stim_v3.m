@@ -14,9 +14,9 @@ function [s] = gen_stim_v3(s)
     s.in = zeros(s.k, s.n, size(s.W, 1)); % init return var
     
     for w = 1:size(s.W,1) % loop over W values
-        for i = 1:s.n     % loop over k values
-            s.in(:,i,w) = loc_k(:,i) .* s.W(w,:)';
-        end
+            for i = 1:s.n     % loop over k values
+                    s.in(:,i,w) = loc_k(:,i) .* s.W(w,:)';
+            end
     end
     
     % note s.corr shaped like model output, not inputs (s.in)
