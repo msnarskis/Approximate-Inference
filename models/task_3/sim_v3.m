@@ -73,6 +73,15 @@ for k=stim.ks
     resps = [resps; resp];
 end
 
+%% Save
+
+if equiprob
+    file = strcat(pwd, sprintf("/models/task_3/sims/simS-max-diff-class_t-%d_k-%d_nsamp-%d_pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
+else
+    file = strcat(pwd, sprintf("/models/task_3/sims/sim-max-diff-class_t-%d_k-%d_nsamp-%d_pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
+end
+%save(file,'resps','par','stim');
+
 %% configure for plots
 % colors - index by: K_COL(i,:)
 r_start = 0;
@@ -272,14 +281,6 @@ for i=1:s
     set(gcf,'Position',[100 100 1600 1000]);
 end
 end
-%% Save
-
-if equiprob
-    file = strcat(pwd, sprintf("/models/task_2/v2/sims/simW_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
-else
-    file = strcat(pwd, sprintf("/models/task_2/v2/sims/sim_max_diff_class-t:%d-k:%d-nsamp:%d-pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
-end
-%save(file,'resps','par','stim');
 
 %% Aux Functions
 
