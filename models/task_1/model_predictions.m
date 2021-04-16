@@ -1,8 +1,8 @@
 %% Stimulus Parameters
-eps_range = [-2, 2];
-num_eps = 60;
+eps_range = [0, 2];
+num_eps = 200;
 
-k = 5;
+k = 1;
 w = 1;
 
 dmu = (range(2) - range(1)) / range(3);
@@ -12,9 +12,9 @@ pr_R = 0.5;
 num_pr_C = 1;
 pr_C = linspace(0, .5, num_pr_C);
 num_pr_W = 1;
-pr_W = linspace(0.5, .75, num_pr_W);
+pr_W = linspace(0.5, .5, num_pr_W);
 
-sig_v = 0.01;
+sig_v = 0.1;
 sig_t = 1;
 sig_n = 1;
 sig_ap = 100;

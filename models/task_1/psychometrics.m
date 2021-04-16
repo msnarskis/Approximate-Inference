@@ -20,7 +20,7 @@ clc;
 %         0: center condition  (eps_v = zeros)
 
 % stimulus variables
-range = [-30, 30, 21];
+range = [0, 3, 600];
 stim_sig_t = 1;
 stim_sig_n = 1;
 stim_sig_v = .1;
@@ -48,7 +48,7 @@ dmu = (range(2) - range(1)) / range(3);
 
 % theta variables
 pr_R = .5; 
-pr_C = 1;
+pr_C = .5;
 pr_W = 1;
 sig_v = stim_sig_v;
 sig_t = stim_sig_t;
@@ -57,7 +57,7 @@ sig_ap = 100;
 sig_vp = 100;
 mu_vp = 0;
 lapse = 0;
-nsamples = Inf;
+nsamples = 1;
 
 theta = [pr_R, pr_C, pr_W, sig_v, sig_t, sig_n, sig_ap, sig_vp, mu_vp, lapse, nsamples];
 
@@ -80,13 +80,14 @@ stim(5) = 5; % k
 
 
 % diff between match and central
-diff_1 = sum(abs(c1_1 - c0_1)) * dmu;
+diff_1 = c1_1 - c0_1;
 %diff_2 = sum(abs(c1_2 - c0_2)) * dmu;
 %diff_3 = sum(abs(c1_3 - c0_3)) * dmu;
 %diff_4 = sum(abs(c1_4 - c0_4)) * dmu;
 %diff_5 = sum(abs(c1_5 - c0_5)) * dmu;
 
 %% plot(50:end)
+figure;
 hold on
 %plot([1 2 3 4 5], [diff_1 diff_2 diff_3 diff_4 diff_5])
 plot(mu_a1, c1_1, 'Linewidth', 2);
@@ -102,6 +103,7 @@ legend('match smp=1', 'central smp=1', 'match smp=100', 'central smp=100', 'matc
 title("P(R|X) as a function of k");
 
 %% TEST
-mu_a = linspace(stim(1), stim(2), stim(3));
+figure;
+hold on
+plot(movmean(c0_1,12), movmean(diff_1,12))
 
-generate_stimulus(mu_a, stim(4), stim(5), stim(6), stim(7), stim(8), stim(9))

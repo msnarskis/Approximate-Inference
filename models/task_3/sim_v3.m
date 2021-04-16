@@ -7,7 +7,7 @@ stim.n = 25;
 stim.ks = [2,3,5,7];
 stim.kslab = {'k=2','k=3','k=5','k=7','k=9'};
 
-s = size(stim.ks,2);
+stim.s = size(stim.ks,2);
 
 % model parameters
 par.var_t = 10; % (std dev)
@@ -20,7 +20,7 @@ par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = 1; % trials per W vector
-par.ntrials = 1000;
+par.ntrials = 8000;
 
 par.noisy_in = 1;
 
@@ -74,15 +74,16 @@ for k=stim.ks
 end
 
 %% Save
-
+equiprob = 0;
 if equiprob
     file = strcat(pwd, sprintf("/models/task_3/sims/simS-max-diff-class_t-%d_k-%d_nsamp-%d_pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
 else
     file = strcat(pwd, sprintf("/models/task_3/sims/sim-max-diff-class_t-%d_k-%d_nsamp-%d_pC%1.1f.mat", par.ntrials, stim.ks(end), par.nsamp, par.pr_C));
 end
-%save(file,'resps','par','stim');
+save(file,'resps','par','stim');
 
 %% configure for plots
+s = stim.s;
 % colors - index by: K_COL(i,:)
 r_start = 0;
 r_end = 1;
@@ -101,8 +102,9 @@ b_end = 0;
 K_COL_bg = [linspace(r_start, r_end, s); linspace(g_start, g_end, s); linspace(b_start, b_end, s); linspace(0.6,0.6,s)]';
 
 % misc
-position_huge = [100 0 1600 1000];
+position_huge = [100 0 1700 900];
 position_ok = [100 200 1600 600];
+position_ppt = [100 100 900 450;]
 
 % plot psychometric curves and diff between match, center
 figure
@@ -136,8 +138,8 @@ end
 
 
 subplot(2,2,[1,3]);
-xlim(stim.eps_range);
-title(sprintf("Psychometric: Match -- nsamp:%d",par.nsamp));
+xlim(stim.eps_range);ylim([0.5,1]);
+title(sprintf("Even/Odd Task Psychometric Curve -- nsamp:%d",par.nsamp));
 xlabel("stim: dist from center");ylabel("P(correct)");
 legend([lbl1 lbl2], 'Location','best');
 
@@ -147,13 +149,13 @@ legend([lbl1 lbl2], 'Location','best');
 % xlabel("stim: dist from center");ylabel("P(correct)");
 % legend(lbl2,stim.kslab,'Location','best');
 
-subplot(2,2,[2 4]);
+subplot(2,2,[2 4]);ylim([-.01,.06]);
 xlim(stim.eps_range);
 title(sprintf("Difference in curves (M-C) -- nsamp:%d",par.nsamp));
 xlabel("stim: dist from center");ylabel("\Delta P(correct)");
 legend(lbl3,stim.kslab,'Location','best');
 
-set(gcf,'Position',position_ok);
+set(gcf,'Position',position_ppt);
 
 
 %% plot flattened curves max diff
