@@ -1,9 +1,9 @@
-function [mu_hat results_c0 results_c1] = approx_model(stim, model)
+function [mu_hat, results_c0, results_c1] = approx_model(stim, model)
 
     % Stimulus Parameters
     eps_range = [stim(1) stim(2)];
     num_eps = stim(3);
-    eps = linspace(eps_range(1), eps_range(2), num_eps);
+    eps_t = linspace(eps_range(1), eps_range(2), num_eps);
 
     k = stim(4);
     w = stim(5);
@@ -17,9 +17,9 @@ function [mu_hat results_c0 results_c1] = approx_model(stim, model)
 
     %% Generate Stimulus
     
-    ext_samp = 5000; % draws of X ~ eps
+    ext_samp = 10000; % draws of X ~ eps
 
-    mu_hat = eps;% / ((2*w - 1));
+    mu_hat = eps_t;% / ((2*w - 1));
 
     X_t_nW = randn(k, size(mu_hat, 2), ext_samp)*sqrt(sig_t) + repmat(mu_hat, [k, 1, ext_samp]);
     X_n_nW = randn(k, size(mu_hat, 2), ext_samp)*sqrt(sig_n) - repmat(mu_hat, [k, 1, ext_samp]);
@@ -28,7 +28,12 @@ function [mu_hat results_c0 results_c1] = approx_model(stim, model)
     X_vr0 =  randn(k, size(mu_hat, 2), ext_samp)*sqrt(sig_v); % audio cue locations for each k (central)
     X_vl0 =  randn(k, size(mu_hat, 2), ext_samp)*sqrt(sig_v); % audio cue locations for each k (central)
 
-    W = sign(binornd(1, w, size(X_t_nW)) - 0.5); % correct response
+    W = sign(binornd(1, w, [size(X_t_nW,1),1]) - 0.5); % correct response
+	W = repmat(W,[1, size(mu_hat, 2), ext_samp]);
+	
+	% debug
+	[size( X_t_nW); size(W)];
+	
     X_t = W .* X_t_nW;
     X_n = W .* X_n_nW;
     

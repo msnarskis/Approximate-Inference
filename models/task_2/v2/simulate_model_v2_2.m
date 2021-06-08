@@ -19,7 +19,7 @@ par.pr_C = 0.5;
 par.nsamp = 1; % trials per W vector
 par.ntrials = 1;
 
-par.noisy_in = 0;
+par.noisy_in = 1;
 
 
 % stimulus and plot selection

@@ -9,7 +9,7 @@ function [resp] = model_v2_2(stim,par,cond)
 % noise_a, noise_v, nsamp, ntrials
 
     % timing (slowpoke code)
-    time.start = cpuTime;
+    time.start = cputime;
 
     % local parameter values (for speed maybe?)
     var_t = par.var_t; % (std dev)

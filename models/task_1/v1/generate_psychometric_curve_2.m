@@ -13,7 +13,7 @@ function [psycho_curve] = generate_psychometric_curve_2(thet, eps_t, eps_n, eps_
 %   8  - visual perception uncertainty        \sigma_vp^2
 %   9  - visual perception prior mean         \mu_vp^2
 %   10 - lapse rate
-%   11 - nsamples (1 - 100), -Inf, or Inf
+%   11 - nsamples (1 - 100) or Inf
 
 % eps_a - Auditory Cue Location     size(num_locations, k, smp)
 % eps_vr - Left Visual Cue Location size(num_locations, k, smp)
@@ -99,8 +99,16 @@ WC = (pr_W).*(pr_C).*normpdf(mu_sa, R*mu_sv, sqrt(sig_t.*a_tn.*a_sa + .5*sig_v.*
 pX_r2 = exp(sum(log(nWnC + WnC + nWC + WC), 1)) * (1-pr_R);
 
 
+% DEBUG
+sum(any(pX_r1==pX_r2));
+
 % normalize, sample, and return
 pr_Xr = pX_r1 ./ (pX_r1 + pX_r2);
+
+% debug
+if any(any(isnan(pr_Xr)))
+	sprintf("isNans in pr_Xr!")
+end
 
 pr_Xr(isnan(pr_Xr)) = .5;
 

@@ -9,7 +9,7 @@ stim.kslab = {'k=2','k=3','k=5','k=7'};
 
 s = size(stim.ks,2);
 
-equiprob = 1; % 1:equiprobable P(W|R), otw OG
+equiprob = 0; % 1:equiprobable P(W|R), otw OG
 
 % model parameters
 par.var_t = 10; % (std dev)
@@ -22,7 +22,7 @@ par.pr_R = 0.5;
 par.pr_C = 0.5;
 
 par.nsamp = 1; % trials per W vector
-par.ntrials = 50000;
+par.ntrials = 1000;
 
 par.noisy_in = 1;
 
@@ -70,7 +70,7 @@ for k=stim.ks
     resp.center_r1 = resp.center(:,1);
     resp.center_r0 = mean(resp.center(:,2:end), 2);
     
-    if equiprob
+    if 0
         resp.match_corr_mean = mean(resp.match_corr,2);
         resp.center_corr_mean = mean(resp.center_corr,2);
         resp.match_mean = mean(resp.match,2);
@@ -91,9 +91,25 @@ for k=stim.ks
     resps = [resps; resp];
 end
 
-% plot psychometric curves and diff between match, center
+%% plot psychometric curves and diff between match, center
 figure
 hold on
+
+r_start = 0;
+r_end = 1;
+g_start = 0.15; 
+g_end = 0.3;
+b_start= 1;
+b_end = 0;
+K_COL_BG = [linspace(r_start, r_end, s); linspace(g_start, g_end, s); linspace(b_start, b_end, s)]';
+
+r_start = 0;
+r_end = 1;
+g_start = 0.6; 
+g_end = 0.0;
+b_start= 1;
+b_end = 0;
+K_COL_bg = [linspace(r_start, r_end, s); linspace(g_start, g_end, s); linspace(b_start, b_end, s); linspace(0.6,0.6,s)]';
 
 % for legends
 lbl1 = [];
@@ -104,18 +120,18 @@ lbl3 = [];
 for i=1:s
     % match
     subplot(2,2,1);hold on;
-    plot(stim.eps, resps(i).match, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
-    lbl1 = [lbl1 plot(stim.eps, resps(i).match_mean, 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 5)];
+    plot(stim.eps, resps(i).match_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl1 = [lbl1 plot(stim.eps, resps(i).match_corr_mean, 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 5)];
 
     % center   
     subplot(2,2,3);hold on;
-    plot(stim.eps, resps(i).center, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
-    lbl2 = [lbl2 plot(stim.eps, resps(i).center_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
+    plot(stim.eps, resps(i).center_corr, '--', 'Color',K_COL_bg(i,:), 'LineWidth', 1);
+    lbl2 = [lbl2 plot(stim.eps, resps(i).center_corr_mean, 'Color',K_COL_bg(i,:), 'LineWidth', 5)];
     
     % difference    
     subplot(2,2,[2 4]);hold on;
-    plot(stim.eps, resps(i).diff, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
-    lbl3 = [lbl3 plot(stim.eps, resps(i).diff_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
+    plot(stim.eps, resps(i).diff_corr, '--', 'Color',[i/s, 0.3, 1-(i/s)], 'LineWidth', 1);
+    lbl3 = [lbl3 plot(stim.eps, resps(i).diff_corr_mean, 'Color',[i/s,0.3, 1-(i/s)], 'LineWidth', 5)];
 end
 
 
@@ -137,7 +153,7 @@ title(sprintf("Difference in curves (M-C) -- nsamp:%d",par.nsamp));
 xlabel("stim: dist from center");ylabel("\Delta P(correct)");
 legend(lbl3,stim.kslab,'Location','best');
 
-set(gcf,'Position',[100 100 1600 1000]);
+set(gcf,'Position',[100 100 900 450]);
 
 
 %% plot flattened curves max diff
@@ -276,7 +292,7 @@ save(file,'resps','par','stim');
 
 %% Aux Functions
 
-% takes a properly weighted average of stim classes
+% takes a properly weighted average of stim classe
 % for full experiment
 function [exp] = class_collapse(resp,k,w)
     if w
